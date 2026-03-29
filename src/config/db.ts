@@ -1,5 +1,13 @@
 import "dotenv/config";
 import { Sequelize } from "sequelize-typescript";
+import { Brand } from "../features/brand/brand.model";
+import { Category } from "../features/category/category.model";
+import { Favourite } from "../features/favourite/favourite.model";
+import { GmailOtp } from "../features/gmailOtp/gmailOtp.model";
+import { PhoneOtp } from "../features/phoneOtp/phoneOtp.model";
+import { Product } from "../features/product/product.model";
+import { User } from "../features/user/user.model";
+import { UserActivity } from "../features/userActivity/userActivity.model";
 
 export const sequelize = new Sequelize({
   dialect: "postgres",
@@ -9,6 +17,16 @@ export const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   logging: false,
+  models: [
+    Brand,
+    Category,
+    Favourite,
+    GmailOtp,
+    PhoneOtp,
+    Product,
+    User,
+    UserActivity,
+  ],
 });
 
 export const connectDB = async (): Promise<void> => {
