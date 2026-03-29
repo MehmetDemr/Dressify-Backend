@@ -6,76 +6,86 @@ import {
   PrimaryKey,
   Default,
   AllowNull,
-  HasMany,
+  Unique,
 } from "sequelize-typescript";
-import { Favourite } from "../favourite/favourite.model";
-import { UserActivity } from "../userActivity/userActivity.model";
-
-export enum UserGender {
-  MAN = "man",
-  WOMAN = "woman",
-  NO_SPECIFY = "noSpecify",
-}
+import {
+  CreationOptional,
+  InferAttributes,
+  InferCreationAttributes,
+} from "sequelize";
 
 export enum Role {
-  ADMIN = "admin",
-  MERCHANT = "merchant",
   USER = "user",
+  ADMIN = "admin",
+}
+
+export enum UserGender {
+  MALE = "male",
+  FEMALE = "female",
 }
 
 @Table({
   tableName: "user",
   timestamps: true,
 })
-export class User extends Model<User> {
+export class User extends Model<
+  InferAttributes<User>,
+  InferCreationAttributes<User>
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  declare id: string;
+  declare id: CreationOptional<string>;
 
   @AllowNull(false)
+  @Unique
   @Column(DataType.STRING)
   declare userName: string;
 
   @AllowNull(false)
-  @Column(DataType.ENUM(...Object.values(UserGender)))
-  declare gender: UserGender;
-
-  @AllowNull(true)
-  @Column(DataType.DATE)
-  declare firstLogin: Date;
-
-  @AllowNull(true)
-  @Column(DataType.DATE)
-  declare lastLogin: Date;
-
-  @AllowNull(false)
-  @Column(DataType.STRING)
+  @Unique
+  @Column({
+    type: DataType.STRING,
+    validate: {
+      isEmail: true,
+    },
+  })
   declare email: string;
-
-  @AllowNull(true)
-  @Column(DataType.STRING)
-  declare address: string;
-
-  @AllowNull(false)
-  @Column(DataType.STRING)
-  declare phone: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
   declare password: string;
 
   @AllowNull(false)
-  @Column(DataType.ENUM(...Object.values(Role)))
-  declare role: Role;
+  @Unique
+  @Column(DataType.STRING)
+  declare phone: string;
 
   @AllowNull(false)
+  @Column(DataType.ENUM(...Object.values(UserGender)))
+  declare gender: UserGender;
+
+  @AllowNull(false)
+  @Default(true)
   @Column(DataType.BOOLEAN)
-  declare active: boolean;
+  declare active: CreationOptional<boolean>;
 
-  @HasMany(() => Favourite)
-  declare favourites: Favourite[];
+  @AllowNull(false)
+  @Default(Role.USER)
+  @Column(DataType.ENUM(...Object.values(Role)))
+  declare role: CreationOptional<Role>;
 
-  @HasMany(() => UserActivity)
-  declare userActivity: UserActivity[];
+  @AllowNull(true)
+  @Column(DataType.DATE)
+  declare firstLogin: CreationOptional<Date>;
+
+  @AllowNull(true)
+  @Column(DataType.DATE)
+  declare lastLogin: CreationOptional<Date>;
+
+  @Column(DataType.DATE)
+  declare createdAt: CreationOptional<Date>;
+
+  @Column(DataType.DATE)
+  declare updatedAt: CreationOptional<Date>;
 }
