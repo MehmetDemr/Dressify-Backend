@@ -17,11 +17,18 @@ import {
 export enum Role {
   USER = "user",
   ADMIN = "admin",
+  MERCHEANT = "mercheant",
 }
 
 export enum UserGender {
   MALE = "male",
   FEMALE = "female",
+}
+
+export enum UserType {
+  GOOGLE = "google_user",
+  APPLE = "apple_user",
+  STANDART = "standart_user",
 }
 
 @Table({
@@ -69,6 +76,11 @@ export class User extends Model<
   @Default(true)
   @Column(DataType.BOOLEAN)
   declare active: CreationOptional<boolean>;
+
+  @AllowNull(false)
+  @Default(UserType.STANDART)
+  @Column(DataType.ENUM(...Object.values(UserType)))
+  declare userType: CreationOptional<UserType>;
 
   @AllowNull(false)
   @Default(Role.USER)
