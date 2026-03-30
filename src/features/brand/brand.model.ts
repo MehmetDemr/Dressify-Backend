@@ -9,6 +9,12 @@ import {
   HasMany,
 } from "sequelize-typescript";
 
+import {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from "sequelize";
+
 import { Category } from "../category/category.model";
 import { UserActivity } from "../userActivity/userActivity.model";
 
@@ -16,11 +22,14 @@ import { UserActivity } from "../userActivity/userActivity.model";
   tableName: "brand",
   timestamps: true,
 })
-export class Brand extends Model<Brand> {
+export class Brand extends Model<
+  InferAttributes<Brand>,
+  InferCreationAttributes<Brand>
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  declare id: string;
+  declare id: CreationOptional<string>;
 
   @AllowNull(false)
   @Column(DataType.STRING)
@@ -31,12 +40,13 @@ export class Brand extends Model<Brand> {
   declare brandSlug: string;
 
   @AllowNull(false)
+  @Default(true)
   @Column(DataType.BOOLEAN)
-  declare active: boolean;
+  declare active: CreationOptional<boolean>;
 
   @HasMany(() => Category)
-  declare categories: Category[];
+  declare categories: CreationOptional<Category[]>;
 
   @HasMany(() => UserActivity)
-  declare userActivity: UserActivity[];
+  declare userActivity: CreationOptional<UserActivity[]>;
 }

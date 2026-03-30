@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import userRoutes from "./src/features/user/user.route";
+import brandRoutes from "./src/features/brand/brand.route";
 import { errorHandler } from "./src/middlewares/errorHandler";
 
 // Import other feature routes here
@@ -19,6 +20,8 @@ app.use(compression()); // Compress response bodies
 // API Routes
 
 app.use("/api/user", userRoutes);
+
+app.use("/api/brand", brandRoutes);
 
 //app.use("/api/auth", authRoutes);
 //app.use("/api/users", userRoutes);
