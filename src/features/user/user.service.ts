@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User, Role } from "./user.model";
+import { User, Role, UserType } from "./user.model";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { UserResponseDto } from "./dto/user-response.dto";
@@ -26,6 +26,7 @@ export const registerService = async (dto: RegisterDto) => {
     ...dto,
     password: hashedPassword,
     role: Role.USER,
+    userType: UserType.STANDART,
     active: true,
     firstLogin: new Date(),
     lastLogin: new Date(),
