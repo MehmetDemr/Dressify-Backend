@@ -1,28 +1,22 @@
 import {
-  Table,
-  Column,
-  Model,
-  DataType,
-  PrimaryKey,
-  Default,
-  AllowNull,
-  ForeignKey,
-  BelongsTo,
-  HasMany,
+  Table, Column, Model, DataType,
+  PrimaryKey, Default, AllowNull,
+  ForeignKey, BelongsTo, HasMany,
 } from "sequelize-typescript";
+import { InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
 import { Category } from "../category/category.model";
 import { Favourite } from "../favourite/favourite.model";
 import { UserActivity } from "../userActivity/userActivity.model";
 
-@Table({
-  tableName: "product",
-  timestamps: true,
-})
-export class Product extends Model<Product> {
+@Table({ tableName: "product", timestamps: true })
+export class Product extends Model<
+  InferAttributes<Product>,
+  InferCreationAttributes<Product>
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  declare id: string;
+  declare id: CreationOptional<string>;
 
   @ForeignKey(() => Category)
   @AllowNull(false)
@@ -39,7 +33,7 @@ export class Product extends Model<Product> {
 
   @AllowNull(true)
   @Column(DataType.STRING)
-  declare description: string;
+  declare description: CreationOptional<string>;
 
   @AllowNull(false)
   @Column(DataType.DECIMAL)
@@ -57,12 +51,12 @@ export class Product extends Model<Product> {
   declare category: Category;
 
   @HasMany(() => Favourite)
-  declare favourites: Favourite[];
+  declare favourites: CreationOptional<Favourite[]>;
 
   @HasMany(() => UserActivity)
-  declare userActivity: UserActivity[];
+  declare userActivity: CreationOptional<UserActivity[]>;
 
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
-  declare active: boolean;
+  declare active: CreationOptional<boolean>;
 }
