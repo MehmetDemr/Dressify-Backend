@@ -1,4 +1,4 @@
-import { Role, UserGender } from "../user.model";
+import { UserGender, UserType } from "../user.model";
 import { User } from "../user.model";
 
 export class UserResponseDto {
@@ -9,6 +9,7 @@ export class UserResponseDto {
   active: boolean;
   firstLogin: Date | null;
   lastLogin: Date | null;
+  userType: UserType;
 
   constructor(user: User) {
     this.userName = user.userName;
@@ -18,5 +19,6 @@ export class UserResponseDto {
     this.active = user.active;
     this.firstLogin = user.firstLogin;
     this.lastLogin = user.lastLogin;
+    this.userType = user.userType;
   }
 }
