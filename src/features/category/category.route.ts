@@ -18,19 +18,19 @@ router.get("/brand/:brandId", getCategoriesByBrand); // Public
 router.post(
   "/",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   createCategory,
 ); // Admin & Merchant
 router.patch(
   "/:id",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   updateCategory,
 ); // Admin & Merchant
 router.delete(
   "/:id",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   deleteCategory,
 ); // Admin & Merchant
 

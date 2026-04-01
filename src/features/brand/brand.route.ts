@@ -16,19 +16,19 @@ router.get("/:id", getBrandById); // Public
 router.post(
   "/",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   createBrand,
 );
 router.patch(
   "/:id",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   updateBrand,
 );
 router.delete(
   "/:id",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   deleteBrand,
 );
 

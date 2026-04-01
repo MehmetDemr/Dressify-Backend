@@ -17,7 +17,7 @@ import {
 export enum Role {
   USER = "user",
   ADMIN = "admin",
-  MERCHEANT = "mercheant",
+  MERCHANT = "merchant",
 }
 
 export enum UserGender {
