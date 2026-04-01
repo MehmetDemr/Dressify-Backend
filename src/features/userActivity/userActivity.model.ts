@@ -9,6 +9,12 @@ import {
   ForeignKey,
   BelongsTo,
 } from "sequelize-typescript";
+import {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  NonAttribute,
+} from "sequelize";
 import { User } from "../user/user.model";
 import { Brand } from "../brand/brand.model";
 import { Category } from "../category/category.model";
@@ -20,15 +26,15 @@ export enum ActivityTypes {
   SHOPPING = "shopping",
 }
 
-@Table({
-  tableName: "userActivity",
-  timestamps: true,
-})
-export class UserActivity extends Model<UserActivity> {
+@Table({ tableName: "userActivity", timestamps: true })
+export class UserActivity extends Model<
+  InferAttributes<UserActivity>,
+  InferCreationAttributes<UserActivity>
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  declare id: string;
+  declare id: CreationOptional<string>;
 
   @ForeignKey(() => User)
   @AllowNull(false)
@@ -56,17 +62,17 @@ export class UserActivity extends Model<UserActivity> {
 
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
-  declare active: boolean;
+  declare active: CreationOptional<boolean>;
 
   @BelongsTo(() => User)
-  declare user: User;
+  declare user: NonAttribute<User>;
 
   @BelongsTo(() => Brand)
-  declare brand: Brand;
+  declare brand: NonAttribute<Brand>;
 
   @BelongsTo(() => Category)
-  declare category: Category;
+  declare category: NonAttribute<Category>;
 
   @BelongsTo(() => Product)
-  declare product: Product;
+  declare product: NonAttribute<Product>;
 }
