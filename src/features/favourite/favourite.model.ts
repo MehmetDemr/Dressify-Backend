@@ -9,18 +9,24 @@ import {
   ForeignKey,
   BelongsTo,
 } from "sequelize-typescript";
+import {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  NonAttribute, // Bunu ekleyin
+} from "sequelize";
 import { User } from "../user/user.model";
 import { Product } from "../product/product.model";
 
-@Table({
-  tableName: "favourite",
-  timestamps: true,
-})
-export class Favourite extends Model<Favourite> {
+@Table({ tableName: "favourite", timestamps: true })
+export class Favourite extends Model<
+  InferAttributes<Favourite>,
+  InferCreationAttributes<Favourite>
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
-  declare id: string;
+  declare id: CreationOptional<string>;
 
   @ForeignKey(() => User)
   @AllowNull(false)
@@ -33,12 +39,12 @@ export class Favourite extends Model<Favourite> {
   declare product_id: string;
 
   @BelongsTo(() => User)
-  declare user: User;
+  declare user?: NonAttribute<User>;
 
   @BelongsTo(() => Product)
-  declare product: Product;
+  declare product?: NonAttribute<Product>;
 
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
-  declare active: boolean;
+  declare active: CreationOptional<boolean>;
 }
