@@ -18,19 +18,19 @@ router.get("/category/:categoryId", getProductsByCategory); // Public
 router.post(
   "/",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   createProduct,
 ); // Admin & Merchant
 router.patch(
   "/:id",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   updateProduct,
 ); // Admin & Merchant
 router.delete(
   "/:id",
   authenticate,
-  authorize(Role.ADMIN, Role.MERCHEANT),
+  authorize(Role.ADMIN, Role.MERCHANT),
   deleteProduct,
 ); // Admin & Merchant
 
