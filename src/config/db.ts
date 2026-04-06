@@ -9,20 +9,24 @@ import { Product } from "../features/product/product.model";
 import { User } from "../features/user/user.model";
 import { UserActivity } from "../features/userActivity/userActivity.model";
 
+const useSSL = process.env.DB_SSL === "true";
+
 export const sequelize = new Sequelize({
   dialect: "postgres",
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASS,
   logging: false,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
+  dialectOptions: useSSL
+    ? {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      }
+    : {},
   models: [
     Brand,
     Category,
