@@ -50,3 +50,15 @@ export const loginService = async (dto: LoginDto) => {
 
   return { token, user: new UserResponseDto(user) };
 };
+
+export const getMeService = async (userId: string) => {
+  const user = await User.findByPk(userId, {
+    attributes: { exclude: ["password"] },
+  });
+
+  if (!user) {
+    throw new AppError("User not found.", 404);
+  }
+
+  return user;
+};

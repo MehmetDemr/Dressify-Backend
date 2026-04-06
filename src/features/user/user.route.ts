@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login } from "./user.controller";
+import { register, login, getMe } from "./user.controller";
 import { authenticate, authorize } from "../../middlewares/auth.middleware";
 import { Role } from "./user.model";
 
@@ -10,9 +10,7 @@ router.post("/register", register);
 router.post("/login", login);
 
 // Protected route
-router.get("/me", authenticate, (req, res) => {
-  res.json({ success: true, data: (req as any).user });
-});
+router.get("/me", authenticate, getMe);
 
 // Admin only route
 router.get("/admin", authenticate, authorize(Role.ADMIN), (req, res) => {
