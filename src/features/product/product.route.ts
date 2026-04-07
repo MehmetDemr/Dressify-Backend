@@ -12,9 +12,9 @@ import { Role } from "../user/user.model";
 
 const router = Router();
 
-router.get("/", getAllProducts); // Public
-router.get("/:id", getProductById); // Public
-router.get("/category/:categoryId", getProductsByCategory); // Public
+router.get("/", authenticate,getAllProducts); // Public
+router.get("/:id", authenticate, getProductById); // Public
+router.get("/category/:categoryId",authenticate, getProductsByCategory); // Public
 router.post(
   "/",
   authenticate,

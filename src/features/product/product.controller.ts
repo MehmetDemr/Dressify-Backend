@@ -45,7 +45,8 @@ export const getAllProducts = async (
   next: NextFunction,
 ) => {
   try {
-    const products = await getAllProductsService();
+    const userId = req.user?.id;
+    const products = await getAllProductsService(userId);
     res.status(200).json({ success: true, data: products });
   } catch (error) {
     next(error);
@@ -58,7 +59,11 @@ export const getProductById = async (
   next: NextFunction,
 ) => {
   try {
-    const product = await getProductByIdService(req.params.id as string);
+    const userId = req.user?.id;
+    const product = await getProductByIdService(
+      req.params.id as string,
+      userId,
+    );
     res.status(200).json({ success: true, data: product });
   } catch (error) {
     next(error);
@@ -71,7 +76,11 @@ export const getProductsByCategory = async (
   next: NextFunction,
 ) => {
   try {
-    const products = await getProductsByCategoryService(req.params.categoryId as string);
+    const userId = req.user?.id;
+    const products = await getProductsByCategoryService(
+      req.params.categoryId as string,
+      userId,
+    );
     res.status(200).json({ success: true, data: products });
   } catch (error) {
     next(error);
