@@ -42,16 +42,19 @@ export const removeFavouriteService = async (
   userId: string,
   favouriteId: string,
 ) => {
-  const favourite = await Favourite.findOne({
+  const deletedCount = await Favourite.destroy({
     where: { id: favouriteId, user_id: userId },
   });
-  if (!favourite) throw new AppError("Favourite not found.", 404);
 
-  await favourite.update({ active: false });
+  if (deletedCount === 0) throw new AppError("Favourite not found.", 404);
+
   return { message: "Product removed from favourites." };
 };
 
 export const clearFavouritesService = async (userId: string) => {
-  await Favourite.update({ active: false }, { where: { user_id: userId } });
+  await Favourite.destroy({
+    where: { user_id: userId },
+  });
+
   return { message: "All favourites cleared." };
 };
