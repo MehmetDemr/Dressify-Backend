@@ -5,6 +5,7 @@ import { UpdateProductDto } from "./dto/update-product.dto";
 import { ProductResponseDto } from "./dto/product-response.dto";
 import { AppError } from "../../utils/appError";
 import { Favourite } from "../favourite/favourite.model";
+import { Brand } from "../brand/brand.model";
 
 export const createProductService = async (dto: CreateProductDto) => {
   const category = await Category.findByPk(dto.category_id);
@@ -22,7 +23,18 @@ export const createProductService = async (dto: CreateProductDto) => {
 export const getAllProductsService = async (userId?: string) => {
   const products = await Product.findAll({
     where: { active: true },
-    include: [{ model: Category, attributes: ["id", "categoryName"] }],
+    include: [
+      {
+        model: Category,
+        attributes: ["id", "categoryName", "categorySlug", "brand_id"],
+        include: [
+          {
+            model: Brand,
+            attributes: ["id", "brandName", "brandSlug"],
+          },
+        ],
+      },
+    ],
   });
 
   let favouriteIds = new Set<string>();
@@ -47,7 +59,18 @@ export const getAllProductsService = async (userId?: string) => {
 
 export const getProductByIdService = async (id: string, userId?: string) => {
   const product = await Product.findByPk(id, {
-    include: [{ model: Category, attributes: ["id", "categoryName"] }],
+    include: [
+      {
+        model: Category,
+        attributes: ["id", "categoryName", "categorySlug", "brand_id"],
+        include: [
+          {
+            model: Brand,
+            attributes: ["id", "brandName", "brandSlug"],
+          },
+        ],
+      },
+    ],
   });
 
   if (!product) throw new AppError("Product not found.", 404);
@@ -83,6 +106,18 @@ export const getProductsByCategoryService = async (
 
   const products = await Product.findAll({
     where: { category_id: categoryId, active: true },
+    include: [
+      {
+        model: Category,
+        attributes: ["id", "categoryName", "categorySlug", "brand_id"],
+        include: [
+          {
+            model: Brand,
+            attributes: ["id", "brandName", "brandSlug"],
+          },
+        ],
+      },
+    ],
   });
 
   let favouriteIds = new Set<string>();
