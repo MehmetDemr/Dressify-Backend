@@ -13,6 +13,18 @@ export class ProductResponseDto {
   createdAt: Date;
   updatedAt: Date;
 
+  category: {
+    id: string;
+    categoryName: string;
+    categorySlug: string;
+    brand_id: string;
+    brand: {
+      id: string;
+      brandName: string;
+      brandSlug: string;
+    } | null;
+  } | null;
+
   constructor(product: Product) {
     this.id = product.id;
     this.category_id = product.category_id;
@@ -25,5 +37,21 @@ export class ProductResponseDto {
     this.active = product.active;
     this.createdAt = product.createdAt;
     this.updatedAt = product.updatedAt;
+
+    this.category = product.category
+      ? {
+          id: product.category.id,
+          categoryName: product.category.categoryName,
+          categorySlug: product.category.categorySlug,
+          brand_id: product.category.brand_id,
+          brand: product.category.brand
+            ? {
+                id: product.category.brand.id,
+                brandName: product.category.brand.brandName,
+                brandSlug: product.category.brand.brandSlug,
+              }
+            : null,
+        }
+      : null;
   }
 }
