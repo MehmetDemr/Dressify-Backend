@@ -46,8 +46,13 @@ export const getAllProducts = async (
 ) => {
   try {
     const userId = req.user?.id;
-    const products = await getAllProductsService(userId);
-    res.status(200).json({ success: true, data: products });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 24;
+    const result = await getAllProductsService(userId, page, limit);
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
   } catch (error) {
     next(error);
   }
@@ -77,11 +82,21 @@ export const getProductsByCategory = async (
 ) => {
   try {
     const userId = req.user?.id;
-    const products = await getProductsByCategoryService(
-      req.params.categoryId as string,
+    const categoryId = req.params.categoryId as string;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 24;
+
+    const result = await getProductsByCategoryService(
+      categoryId,
       userId,
+      page,
+      limit,
     );
-    res.status(200).json({ success: true, data: products });
+
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
   } catch (error) {
     next(error);
   }
