@@ -8,6 +8,7 @@ import categoryRoutes from "./src/features/category/category.route";
 import productRoutes from "./src/features/product/product.route";
 import favouriteRoutes from "./src/features/favourite/favourite.route";
 import userActivityRoutes from "./src/features/userActivity/userActivity.route";
+import cardRoutes from "./src/features/card/card.route";
 import { errorHandler } from "./src/middlewares/errorHandler";
 
 // Import other feature routes here
@@ -34,6 +35,8 @@ app.use("/api/product", productRoutes);
 app.use("/api/favourite", favouriteRoutes);
 
 app.use("/api/userActivity", userActivityRoutes);
+
+app.use("/api/card", cardRoutes);
 
 //app.use("/api/auth", authRoutes);
 //app.use("/api/users", userRoutes);
