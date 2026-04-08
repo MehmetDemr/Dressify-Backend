@@ -20,9 +20,18 @@ export const createProductService = async (dto: CreateProductDto) => {
   return new ProductResponseDto(product);
 };
 
-export const getAllProductsService = async (userId?: string) => {
-  const products = await Product.findAll({
+export const getAllProductsService = async (
+  userId?: string,
+  page: number = 1,
+  limit: number = 24,
+) => {
+  const offset = (page - 1) * limit;
+
+  const { count, rows: products } = await Product.findAndCountAll({
     where: { active: true },
+    limit: limit,
+    offset: offset,
+    distinct: true,
     include: [
       {
         model: Category,
@@ -35,6 +44,7 @@ export const getAllProductsService = async (userId?: string) => {
         ],
       },
     ],
+    order: [["createdAt", "DESC"]],
   });
 
   let favouriteIds = new Set<string>();
@@ -44,17 +54,24 @@ export const getAllProductsService = async (userId?: string) => {
       where: { user_id: userId, active: true },
       attributes: ["product_id"],
     });
-
     favouriteIds = new Set(favourites.map((f) => String(f.product_id)));
   }
 
-  return products.map((p) => {
+  const data = products.map((p) => {
     const dto = new ProductResponseDto(p);
     return {
       ...dto,
       isFavourite: favouriteIds.has(String(p.id)),
     };
   });
+
+  return {
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: Number(page),
+    limit: Number(limit),
+    data,
+  };
 };
 
 export const getProductByIdService = async (id: string, userId?: string) => {
@@ -100,12 +117,19 @@ export const getProductByIdService = async (id: string, userId?: string) => {
 export const getProductsByCategoryService = async (
   categoryId: string,
   userId?: string,
+  page: number = 1,
+  limit: number = 24,
 ) => {
   const category = await Category.findByPk(categoryId);
   if (!category) throw new AppError("Category not found.", 404);
 
-  const products = await Product.findAll({
+  const offset = (page - 1) * limit;
+
+  const { count, rows: products } = await Product.findAndCountAll({
     where: { category_id: categoryId, active: true },
+    limit: limit,
+    offset: offset,
+    distinct: true,
     include: [
       {
         model: Category,
@@ -127,17 +151,24 @@ export const getProductsByCategoryService = async (
       where: { user_id: userId, active: true },
       attributes: ["product_id"],
     });
-
     favouriteIds = new Set(favourites.map((f) => String(f.product_id)));
   }
 
-  return products.map((p) => {
+  const data = products.map((p) => {
     const dto = new ProductResponseDto(p);
     return {
       ...dto,
       isFavourite: favouriteIds.has(String(p.id)),
     };
   });
+
+  return {
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: Number(page),
+    limit: Number(limit),
+    data,
+  };
 };
 
 export const updateProductService = async (
