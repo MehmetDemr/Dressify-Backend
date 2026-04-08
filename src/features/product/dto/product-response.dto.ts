@@ -1,5 +1,13 @@
 import { Product } from "../product.model";
 
+export interface PaginatedProductResponse {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  data: ProductResponseDto[];
+}
+
 export class ProductResponseDto {
   id: string;
   category_id: string;
@@ -12,6 +20,7 @@ export class ProductResponseDto {
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
+  isFavourite?: boolean;
 
   category: {
     id: string;
@@ -25,7 +34,7 @@ export class ProductResponseDto {
     } | null;
   } | null;
 
-  constructor(product: Product) {
+  constructor(product: any) {
     this.id = product.id;
     this.category_id = product.category_id;
     this.productName = product.productName;

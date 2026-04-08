@@ -13,7 +13,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
-  NonAttribute, // Bunu ekleyin
+  NonAttribute,
 } from "sequelize";
 import { User } from "../user/user.model";
 import { Product } from "../product/product.model";

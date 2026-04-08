@@ -42,8 +42,13 @@ export const getUserFavourites = async (
   next: NextFunction,
 ) => {
   try {
-    const favourites = await getUserFavouritesService(req.user!.id);
-    res.status(200).json({ success: true, data: favourites });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 24;
+    const result = await getUserFavouritesService(req.user!.id, page, limit);
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
   } catch (error) {
     next(error);
   }

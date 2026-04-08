@@ -3,6 +3,8 @@ import { Product } from "../product/product.model";
 import { CreateFavouriteDto } from "./dto/create-favourite.dto";
 import { FavouriteResponseDto } from "./dto/favourite-response.dto";
 import { AppError } from "../../utils/appError";
+import { Brand } from "../brand/brand.model";
+import { Category } from "../category/category.model";
 
 export const addFavouriteService = async (
   userId: string,
@@ -25,17 +27,48 @@ export const addFavouriteService = async (
   return new FavouriteResponseDto(favourite);
 };
 
-export const getUserFavouritesService = async (userId: string) => {
-  const favourites = await Favourite.findAll({
+export const getUserFavouritesService = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 24,
+) => {
+  const offset = (page - 1) * limit;
+
+  const { count, rows: favourites } = await Favourite.findAndCountAll({
     where: { user_id: userId, active: true },
+    limit: limit,
+    offset: offset,
+    distinct: true,
     include: [
       {
         model: Product,
         attributes: ["id", "productName", "price", "imageUrl"],
+        include: [
+          {
+            model: Category,
+            attributes: ["id", "categoryName"],
+            include: [
+              {
+                model: Brand,
+                attributes: ["id", "brandName"],
+              },
+            ],
+          },
+        ],
       },
     ],
+    order: [["createdAt", "DESC"]],
   });
-  return favourites.map((f) => new FavouriteResponseDto(f));
+
+  const data = favourites.map((f) => new FavouriteResponseDto(f));
+
+  return {
+    totalItems: count,
+    totalPages: Math.ceil(count / limit),
+    currentPage: Number(page),
+    limit: Number(limit),
+    data,
+  };
 };
 
 export const removeFavouriteService = async (

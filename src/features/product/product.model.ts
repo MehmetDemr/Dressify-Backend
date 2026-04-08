@@ -1,9 +1,20 @@
 import {
-  Table, Column, Model, DataType,
-  PrimaryKey, Default, AllowNull,
-  ForeignKey, BelongsTo, HasMany,
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
-import { InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
+import {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from "sequelize";
 import { Category } from "../category/category.model";
 import { Favourite } from "../favourite/favourite.model";
 import { UserActivity } from "../userActivity/userActivity.model";
@@ -39,7 +50,7 @@ export class Product extends Model<
   @Column(DataType.DECIMAL)
   declare price: number;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.STRING)
   declare imageUrl: string;
 
