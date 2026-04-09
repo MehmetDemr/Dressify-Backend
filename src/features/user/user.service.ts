@@ -35,9 +35,9 @@ export const registerService = async (dto: RegisterDto) => {
 
   await Permission.create({
     user_id: user.id,
-    emailNotifyForNewProduct: false,
+    emailNotifyForNewuser: false,
     emailNotifyForDiscount: false,
-    smsNotifyForNewProduct: false,
+    smsNotifyForNewuser: false,
     smsNotifyForDiscount: false,
     smsTwoFA: false,
     emailToFA: false,
@@ -74,4 +74,13 @@ export const getMeService = async (userId: string) => {
   }
 
   return user;
+};
+
+export const deleteUserService = async (id: string) => {
+  const user = await User.findByPk(id);
+  if (!user) throw new AppError("User not found.", 404);
+
+  await user.destroy();
+
+  return { message: "User deleted successfully." };
 };
