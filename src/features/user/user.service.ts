@@ -5,6 +5,7 @@ import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { AppError } from "../../utils/appError";
+import { Permission } from "../permission/permission.model";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
@@ -31,6 +32,18 @@ export const registerService = async (dto: RegisterDto) => {
     firstLogin: new Date(),
     lastLogin: new Date(),
   });
+
+  await Permission.create({
+    user_id: user.id,
+    emailNotifyForNewProduct: false,
+    emailNotifyForDiscount: false,
+    smsNotifyForNewProduct: false,
+    smsNotifyForDiscount: false,
+    smsTwoFA: false,
+    emailToFA: false,
+    newLoginWarning: false,
+    active: true,
+  } as any);
 
   return new UserResponseDto(user);
 };

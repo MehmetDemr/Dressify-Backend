@@ -9,6 +9,7 @@ import { Product } from "../features/product/product.model";
 import { User } from "../features/user/user.model";
 import { UserActivity } from "../features/userActivity/userActivity.model";
 import { Card } from "../features/card/card.model";
+import { Permission } from "../features/permission/permission.model";
 
 const useSSL = process.env.DB_SSL === "true";
 
@@ -37,7 +38,8 @@ export const sequelize = new Sequelize({
     Product,
     User,
     UserActivity,
-    Card
+    Card,
+    Permission,
   ],
 });
 
