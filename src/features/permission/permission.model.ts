@@ -37,49 +37,49 @@ export class Permission extends Model<
   @Column(DataType.UUID)
   declare user_id: string;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare emailNotifyForNewProduct: boolean;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare emailNotifyForDiscount: boolean;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare smsNotifyForNewProduct: boolean;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare smsNotifyForDiscount: boolean;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare smsTwoFA: boolean;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare emailToFA: boolean;
 
-  @Default(DataType.BOOLEAN)
+  @Default(false)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare newLoginWarning: boolean;
 
   //We will add this feature for the feature not at the moment.
   //App notify
-  //   @Default(DataType.BOOLEAN)
+  //   @Default(false)
   //   @AllowNull(false)
   //   @Column(DataType.BOOLEAN)
   //   declare appAllNotify: boolean;
 
-  //   @Default(DataType.BOOLEAN)
+  //   @Default(false)
   //   @AllowNull(false)
   //   @Column(DataType.BOOLEAN)
   //   declare appFavouriteDiscountNotify: boolean;

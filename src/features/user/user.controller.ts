@@ -1,5 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { registerService, loginService, getMeService } from "./user.service";
+import {
+  registerService,
+  loginService,
+  getMeService,
+  deleteUserService,
+} from "./user.service";
 
 import { AppError } from "../../utils/appError";
 import { RegisterDto } from "./dto/register.dto";
@@ -61,6 +66,25 @@ export const getMe = async (
     res.status(200).json({
       success: true,
       message: "User fetched successfully.",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteMe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = (req as any).user?.id;
+    const result = await deleteUserService(userId);
+
+    res.status(204).json({
+      success: true,
+      message: "User deleted successfully.",
       data: result,
     });
   } catch (error) {
