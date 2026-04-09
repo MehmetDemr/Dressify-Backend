@@ -11,6 +11,7 @@ import { UserActivity } from "../features/userActivity/userActivity.model";
 import { Card } from "../features/card/card.model";
 import { Permission } from "../features/permission/permission.model";
 import { Payment } from "../features/payment/payment.model";
+import { Address } from "../features/address/address.model";
 
 const useSSL = process.env.DB_SSL === "true";
 
@@ -41,7 +42,8 @@ export const sequelize = new Sequelize({
     UserActivity,
     Card,
     Permission,
-    Payment
+    Payment,
+    Address,
   ],
 });
 

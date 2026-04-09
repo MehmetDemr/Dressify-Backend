@@ -10,7 +10,8 @@ import favouriteRoutes from "./src/features/favourite/favourite.route";
 import userActivityRoutes from "./src/features/userActivity/userActivity.route";
 import cardRoutes from "./src/features/card/card.route";
 import permissionRoutes from "./src/features/permission/permission.route";
-import paymentRoutes from "./src/features/payment/payment.route"
+import paymentRoutes from "./src/features/payment/payment.route";
+import addressRoutes from "./src/features/address/address.route";
 import { errorHandler } from "./src/middlewares/errorHandler";
 
 // Import other feature routes here
@@ -42,10 +43,9 @@ app.use("/api/card", cardRoutes);
 
 app.use("/api/permission", permissionRoutes);
 
-app.use("/api/payment",paymentRoutes);
+app.use("/api/payment", paymentRoutes);
 
-//app.use("/api/auth", authRoutes);
-//app.use("/api/users", userRoutes);
+app.use("/api/address",addressRoutes);
 
 //Error handler
 
