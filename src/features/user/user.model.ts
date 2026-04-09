@@ -7,12 +7,21 @@ import {
   Default,
   AllowNull,
   Unique,
+  HasMany,
+  HasOne,
 } from "sequelize-typescript";
 import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  NonAttribute,
 } from "sequelize";
+import { Favourite } from "../favourite/favourite.model";
+import { Card } from "../card/card.model";
+import { Payment } from "../payment/payment.model";
+import { UserActivity } from "../userActivity/userActivity.model";
+import { Address } from "../address/address.model";
+import { Permission } from "../permission/permission.model";
 
 export enum Role {
   USER = "user",
@@ -100,4 +109,22 @@ export class User extends Model<
 
   @Column(DataType.DATE)
   declare updatedAt: CreationOptional<Date>;
+
+  @HasMany(() => Favourite, { onDelete: "CASCADE", hooks: true })
+  declare favourites: NonAttribute<Favourite[]>;
+
+  @HasMany(() => Card, { onDelete: "CASCADE", hooks: true })
+  declare cards: NonAttribute<Card[]>;
+
+  @HasMany(() => Payment, { onDelete: "CASCADE", hooks: true })
+  declare payments: NonAttribute<Payment[]>;
+
+  @HasMany(() => UserActivity, { onDelete: "CASCADE", hooks: true })
+  declare userActivities: NonAttribute<UserActivity[]>;
+
+  @HasMany(() => Address, { onDelete: "CASCADE", hooks: true })
+  declare addresses: NonAttribute<Address[]>;
+
+  @HasOne(() => Permission, { onDelete: "CASCADE", hooks: true })
+  declare permissions: NonAttribute<Permission[]>;
 }

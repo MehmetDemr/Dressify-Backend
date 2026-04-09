@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, getMe } from "./user.controller";
+import { register, login, getMe, deleteMe } from "./user.controller";
 import { authenticate, authorize } from "../../middlewares/auth.middleware";
 import { Role } from "./user.model";
 
@@ -11,6 +11,8 @@ router.post("/login", login);
 
 // Protected route
 router.get("/me", authenticate, getMe);
+
+router.delete("/:id", authenticate, deleteMe);
 
 // Admin only route
 router.get("/admin", authenticate, authorize(Role.ADMIN), (req, res) => {
