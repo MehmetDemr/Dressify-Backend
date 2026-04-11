@@ -9,9 +9,9 @@ import { authenticate } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
-router.get("/", authenticate, getCard);
-router.post("/", authenticate, addToCard);
-router.patch("/:id", authenticate, updateCardQuantity);
-router.delete("/:id", authenticate, removeFromCard);
+router.get("/", authenticate as any, getCard as any);
+router.post("/", authenticate as any, addToCard as any);
+router.patch("/:id", authenticate as any, updateCardQuantity as any);
+router.delete("/:id", authenticate as any, removeFromCard as any);
 
 export default router;

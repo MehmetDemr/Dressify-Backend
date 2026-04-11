@@ -45,7 +45,7 @@ app.use("/api/permission", permissionRoutes);
 
 app.use("/api/payment", paymentRoutes);
 
-app.use("/api/address",addressRoutes);
+app.use("/api/address", addressRoutes);
 
 //Error handler
 

@@ -4,7 +4,7 @@ import { getPermission, updatePermission } from "./permission.controller";
 
 const router = Router();
 
-router.get("/", authenticate, getPermission);
-router.patch("/", authenticate, updatePermission);
+router.get("/", authenticate as any, getPermission as any);
+router.patch("/", authenticate as any, updatePermission as any);
 
 export default router;
