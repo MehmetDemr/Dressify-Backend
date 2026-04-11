@@ -73,7 +73,7 @@ export class User extends Model<
   @Column(DataType.STRING)
   declare password: string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Unique
   @Column(DataType.STRING)
   declare phone: string;

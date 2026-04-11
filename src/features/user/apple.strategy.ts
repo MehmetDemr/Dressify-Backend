@@ -42,8 +42,8 @@ passport.use(
       try {
          const decoded = jwt.decode(idToken as unknown as string) as any;
 
-         console.log("decoded idToken:", decoded); // ← emaili görünce kaldır
-         console.log("profile:", profile); // ← emaili görünce kaldır
+        //  console.log("decoded idToken:", decoded); 
+        //  console.log("profile:", profile); 
 
          const email = decoded?.email ?? (profile as any)?.email;
         if (!email)
@@ -79,7 +79,7 @@ passport.use(
         const user = await User.create({
           userName: finalUserName,
           email,
-          phone: "01112223334",
+          phone: "",
           gender: UserGender.UNKNOWN,
           password: hashedPassword,
           role: Role.USER,
