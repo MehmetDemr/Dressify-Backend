@@ -21,22 +21,17 @@ export const sendOtpService = async (dto: SendPhoneOtpDto) => {
   });
 
   if (existing) {
-    const windowStart = new Date(existing.createdAt.getTime());
-    const elapsed = now.getTime() - windowStart.getTime();
+    const elapsed = now.getTime() - existing.createdAt.getTime();
 
     if (elapsed < OTP_WINDOW_MS) {
-      const attempts = parseInt(existing.code.split(":")[1] ?? "1");
-
-      if (attempts >= MAX_ATTEMPTS) {
+      if (existing.attempts >= MAX_ATTEMPTS) {
         throw new AppError(
           "You can send a maximum of 3 requests within 3 minutes.",
           429,
         );
       }
 
-      await existing.update({
-        code: existing.code.split(":")[0] + ":" + (attempts + 1),
-      });
+      await existing.update({ attempts: existing.attempts + 1 });
     } else {
       await existing.destroy();
     }
@@ -48,11 +43,11 @@ export const sendOtpService = async (dto: SendPhoneOtpDto) => {
 
   await PhoneOtp.create({
     phone: dto.phoneNumber,
-    code: "twilio:1",
+    code: "twilio",
     expiresAt: new Date(now.getTime() + OTP_WINDOW_MS),
   });
 
-  return { message: "OTP send." };
+  return { message: "OTP sent." };
 };
 
 export const verifyOtpService = async (dto: VerifyPhoneOtpDto) => {
@@ -79,6 +74,5 @@ export const verifyOtpService = async (dto: VerifyPhoneOtpDto) => {
   }
 
   await record.destroy();
-
   return { message: "Phone number verified." };
 };
