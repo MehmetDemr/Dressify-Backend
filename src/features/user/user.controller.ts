@@ -137,25 +137,28 @@ export const appleCallbackController = (
   res: Response,
   next: NextFunction,
 ) => {
-  applePassport.authenticate(
-    "apple",
-    { session: false },
-    (err: Error, user: any) => {
-      if (err || !user) {
-        return res.redirect(
-          `${process.env.FRONTEND_URL}/login?error=apple_failed`,
-        );
-      }
+applePassport.authenticate(
+  "apple",
+  { session: false },
+  (err: Error, user: any) => {
+    console.log("Apple callback error:", err); 
+    console.log("Apple callback user:", user); 
 
-      const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET!,
-        { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
-      );
-
+    if (err || !user) {
       return res.redirect(
-        `${process.env.FRONTEND_URL}/auth/apple/callback?token=${token}`,
+        `${process.env.FRONTEND_URL}/login?error=apple_failed`,
       );
-    },
-  )(req, res, next);
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
+    );
+
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/auth/apple/callback?token=${token}`,
+    );
+  },
+)(req, res, next);
 };
