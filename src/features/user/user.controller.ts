@@ -5,7 +5,6 @@ import {
   getMeService,
   deleteUserService,
 } from "./user.service";
-
 import { AppError } from "../../utils/appError";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -13,6 +12,7 @@ import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 import passport from "./google.strategy";
 import jwt from "jsonwebtoken";
+import applePassport from "./apple.strategy";
 
 const validateDto = async (dto: object) => {
   const errors = await validate(dto);
@@ -119,9 +119,42 @@ export const googleCallbackController = (
         process.env.JWT_SECRET!,
         { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
       );
-      
+
       return res.redirect(
         `${process.env.FRONTEND_URL}/auth/google/callback?token=${token}`,
+      );
+    },
+  )(req, res, next);
+};
+
+
+export const appleAuthController = applePassport.authenticate("apple", {
+  session: false,
+});
+
+export const appleCallbackController = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  applePassport.authenticate(
+    "apple",
+    { session: false },
+    (err: Error, user: any) => {
+      if (err || !user) {
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login?error=apple_failed`,
+        );
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET!,
+        { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
+      );
+
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/auth/apple/callback?token=${token}`,
       );
     },
   )(req, res, next);
