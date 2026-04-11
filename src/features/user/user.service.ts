@@ -87,7 +87,7 @@ export const deleteUserService = async (id: string) => {
   return { message: "User deleted successfully." };
 };
 
-const generateGooglePassword = (): string => {
+const generateRandomPassword = (): string => {
   const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lower = "abcdefghijklmnopqrstuvwxyz";
   const special = '!@#$%^&*(),.?":{}|<>';
@@ -122,7 +122,7 @@ export const googleRegisterService = async (dto: GoogleRegisterDto) => {
   if (existingUsername)
     throw new AppError("This username is already signed.", 409);
 
-  const rawPassword = generateGooglePassword();
+  const rawPassword = generateRandomPassword();
   const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
   const user = await User.create({

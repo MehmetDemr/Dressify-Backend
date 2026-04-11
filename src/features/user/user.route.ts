@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, getMe, deleteMe, googleAuthController, googleCallbackController } from "./user.controller";
+import { register, login, getMe, deleteMe, googleAuthController, googleCallbackController, appleCallbackController, appleAuthController } from "./user.controller";
 import { authenticate, authorize } from "../../middlewares/auth.middleware";
 import { Role } from "./user.model";
 
@@ -26,5 +26,8 @@ router.get(
 
 router.get("/google", googleAuthController);
 router.get("/google/callback", googleCallbackController);
+
+router.get("/apple", appleAuthController);
+router.post("/apple/callback", appleCallbackController);
 
 export default router;
