@@ -30,7 +30,10 @@ passport.use(
       clientID: process.env.APPLE_CLIENT_ID!,
       teamID: process.env.APPLE_TEAM_ID!,
       keyID: process.env.APPLE_KEY_ID!,
-      privateKeyString: process.env.APPLE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
+      privateKeyString: process.env
+        .APPLE_PRIVATE_KEY!.replace(/\\n/g, "\n")
+        .replace(/\\r/g, "")
+        .trim(),
       callbackURL: process.env.APPLE_CALLBACK_URL!,
       passReqToCallback: false,
     },
