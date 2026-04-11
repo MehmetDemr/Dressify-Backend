@@ -4,6 +4,7 @@ import { User, UserType, Role, UserGender } from "./user.model";
 import { Permission } from "../permission/permission.model";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const generatePassword = (): string => {
   const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -39,7 +40,12 @@ passport.use(
     },
     async (_accessToken, _refreshToken, idToken, profile, done) => {
       try {
-        const email = (profile as any)?.email ?? (profile as any)?._json?.email;
+         const decoded = jwt.decode(idToken as unknown as string) as any;
+
+         console.log("decoded idToken:", decoded); // ← emaili görünce kaldır
+         console.log("profile:", profile); // ← emaili görünce kaldır
+
+         const email = decoded?.email ?? (profile as any)?.email;
         if (!email)
           return done(new Error("Apple account has no email."), undefined);
 
