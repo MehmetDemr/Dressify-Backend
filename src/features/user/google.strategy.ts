@@ -16,7 +16,7 @@ passport.use(
         const email = profile.emails?.[0]?.value;
         const userName =
           profile.displayName?.replace(/\s+/g, "_") ?? `user_${profile.id}`;
-        const phone = (profile as any).phoneNumbers?.[0]?.value ?? undefined;
+        const phone = (profile as any).phoneNumbers?.[0]?.value ?? null;
 
         if (!email)
           return done(new Error("Google account has no email."), undefined);
