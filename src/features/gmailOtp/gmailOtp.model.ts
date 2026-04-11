@@ -7,12 +7,29 @@ import {
   Default,
   AllowNull,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
+
+interface GmailOtpAttributes {
+  id: string;
+  email: string;
+  code: string;
+  expiresAt: Date;
+  attempts: number;
+}
+
+interface GmailOtpCreationAttributes extends Optional<
+  GmailOtpAttributes,
+  "id" | "attempts"
+> {}
 
 @Table({
   tableName: "gmailOtp",
   timestamps: true,
 })
-export class GmailOtp extends Model<GmailOtp> {
+export class GmailOtp extends Model<
+  GmailOtpAttributes,
+  GmailOtpCreationAttributes
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -29,4 +46,8 @@ export class GmailOtp extends Model<GmailOtp> {
   @AllowNull(false)
   @Column(DataType.DATE)
   declare expiresAt: Date;
+
+  @Default(1)
+  @Column(DataType.INTEGER)
+  declare attempts: number;
 }

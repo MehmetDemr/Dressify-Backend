@@ -14,11 +14,12 @@ interface PhoneOtpAttributes {
   phone: string;
   code: string;
   expiresAt: Date;
+  attempts: number;
 }
 
 interface PhoneOtpCreationAttributes extends Optional<
   PhoneOtpAttributes,
-  "id"
+  "id" | "attempts"
 > {}
 
 @Table({
@@ -45,4 +46,8 @@ export class PhoneOtp extends Model<
   @AllowNull(false)
   @Column(DataType.DATE)
   declare expiresAt: Date;
+
+  @Default(1)
+  @Column(DataType.INTEGER)
+  declare attempts: number;
 }
