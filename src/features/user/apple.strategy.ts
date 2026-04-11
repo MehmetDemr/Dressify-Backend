@@ -40,12 +40,12 @@ passport.use(
     },
     async (_accessToken, _refreshToken, idToken, profile, done) => {
       try {
-         const decoded = jwt.decode(idToken as unknown as string) as any;
+        const decoded = jwt.decode(idToken as unknown as string) as any;
 
-        //  console.log("decoded idToken:", decoded); 
-        //  console.log("profile:", profile); 
+        //  console.log("decoded idToken:", decoded);
+        //  console.log("profile:", profile);
 
-         const email = decoded?.email ?? (profile as any)?.email;
+        const email = decoded?.email ?? (profile as any)?.email;
         if (!email)
           return done(new Error("Apple account has no email."), undefined);
 
@@ -79,7 +79,7 @@ passport.use(
         const user = await User.create({
           userName: finalUserName,
           email,
-          phone: "",
+          phone: null,
           gender: UserGender.UNKNOWN,
           password: hashedPassword,
           role: Role.USER,

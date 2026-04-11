@@ -76,7 +76,7 @@ export class User extends Model<
   @AllowNull(true)
   @Unique
   @Column(DataType.STRING)
-  declare phone: string;
+  declare phone: string | null;
 
   @AllowNull(false)
   @Column(DataType.ENUM(...Object.values(UserGender)))
