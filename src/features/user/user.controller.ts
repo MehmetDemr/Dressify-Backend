@@ -108,6 +108,9 @@ export const googleCallbackController = (
     { session: false },
     (err: Error, user: any) => {
       if (err || !user) {
+                console.log("Google callback error:", err);
+                console.log("Google callback user:", user);
+                console.log("Google auth user:", user?.email);
         return res.status(401).json({
           success: false,
           message: err?.message ?? "Google authentication failed.",
