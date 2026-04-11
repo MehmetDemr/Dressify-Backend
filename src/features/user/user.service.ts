@@ -1,11 +1,13 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User, Role, UserType } from "./user.model";
+import { User, Role, UserType, UserGender } from "./user.model";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { UserResponseDto } from "./dto/user-response.dto";
 import { AppError } from "../../utils/appError";
 import { Permission } from "../permission/permission.model";
+import crypto from "crypto";
+import { GoogleRegisterDto } from "./dto/google-register.dto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
@@ -83,4 +85,88 @@ export const deleteUserService = async (id: string) => {
   await user.destroy();
 
   return { message: "User deleted successfully." };
+};
+
+const generateRandomPassword = (): string => {
+  const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lower = "abcdefghijklmnopqrstuvwxyz";
+  const special = '!@#$%^&*(),.?":{}|<>';
+  const digits = "0123456789";
+  const all = upper + lower + special + digits;
+
+  const pick = (pool: string) => pool[crypto.randomInt(0, pool.length)];
+
+  const mandatory = [pick(upper), pick(lower), pick(special)];
+
+  const totalLength = crypto.randomInt(15, 26);
+  const remaining = totalLength - mandatory.length;
+
+  const rest = Array.from({ length: remaining }, () => pick(all));
+
+  const chars = [...mandatory, ...rest];
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(0, i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+
+  return chars.join("");
+};
+
+export const googleRegisterService = async (dto: GoogleRegisterDto) => {
+  const existingEmail = await User.findOne({ where: { email: dto.email } });
+  if (existingEmail) throw new AppError("This email is already signed.", 409);
+
+  const existingUsername = await User.findOne({
+    where: { userName: dto.userName },
+  });
+  if (existingUsername)
+    throw new AppError("This username is already signed.", 409);
+
+  const rawPassword = generateRandomPassword();
+  const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+  const user = await User.create({
+    userName: dto.userName,
+    email: dto.email,
+    phone: dto.phone ?? "01112223334",
+    gender: UserGender.UNKNOWN,
+    password: hashedPassword,
+    role: Role.USER,
+    userType: UserType.GOOGLE,
+    active: true,
+    firstLogin: new Date(),
+    lastLogin: new Date(),
+  });
+
+  await Permission.create({
+    user_id: user.id,
+    emailNotifyForNewuser: false,
+    emailNotifyForDiscount: false,
+    smsNotifyForNewuser: false,
+    smsNotifyForDiscount: false,
+    smsTwoFA: false,
+    emailToFA: false,
+    newLoginWarning: false,
+    active: true,
+  } as any);
+
+  return new UserResponseDto(user);
+};
+
+// Google Login
+export const googleLoginService = async (email: string) => {
+  const user = await User.findOne({
+    where: {
+      email,
+      userType: UserType.GOOGLE,
+      active: true,
+    },
+  });
+
+  if (!user)
+    throw new AppError("No Google account found with this email.", 404);
+
+  await user.update({ lastLogin: new Date() });
+
+  return new UserResponseDto(user);
 };

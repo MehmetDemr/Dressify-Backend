@@ -9,11 +9,11 @@ import { authenticate } from "../../middlewares/auth.middleware";
 
 const router = Router();
 
-router.use(authenticate);
+router.use(authenticate as any);
 
-router.get("/", getUserFavourites);
-router.post("/", addFavourite);
-router.delete("/clear", clearFavourites);
-router.delete("/:id", removeFavourite);
+router.get("/", getUserFavourites as any);
+router.post("/", addFavourite as any);
+router.delete("/clear", clearFavourites as any);
+router.delete("/:id", removeFavourite as any);
 
 export default router;

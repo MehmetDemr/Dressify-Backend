@@ -12,26 +12,26 @@ import { Role } from "../user/user.model";
 
 const router = Router();
 
-router.get("/", getAllCategories); // Public
-router.get("/:id", getCategoryById); // Public
-router.get("/brand/:brandId", getCategoriesByBrand); // Public
+router.get("/", getAllCategories as any); // Public
+router.get("/:id", getCategoryById as any); // Public
+router.get("/brand/:brandId", getCategoriesByBrand as any); // Public
 router.post(
   "/",
-  authenticate,
-  authorize(Role.ADMIN, Role.MERCHANT),
-  createCategory,
+  authenticate as any,
+  authorize(Role.ADMIN, Role.MERCHANT) as any,
+  createCategory as any,
 ); // Admin & Merchant
 router.patch(
   "/:id",
-  authenticate,
-  authorize(Role.ADMIN, Role.MERCHANT),
-  updateCategory,
+  authenticate as any,
+  authorize(Role.ADMIN, Role.MERCHANT) as any,
+  updateCategory as any,
 ); // Admin & Merchant
 router.delete(
   "/:id",
-  authenticate,
-  authorize(Role.ADMIN, Role.MERCHANT),
-  deleteCategory,
+  authenticate as any,
+  authorize(Role.ADMIN, Role.MERCHANT) as any,
+  deleteCategory as any,
 ); // Admin & Merchant
 
 export default router;
