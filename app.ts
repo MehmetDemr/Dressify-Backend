@@ -12,6 +12,7 @@ import cardRoutes from "./src/features/card/card.route";
 import permissionRoutes from "./src/features/permission/permission.route";
 import paymentRoutes from "./src/features/payment/payment.route";
 import addressRoutes from "./src/features/address/address.route";
+import phoneOtpRoutes from "./src/features/phoneOtp/phoneOtp.route";
 import { errorHandler } from "./src/middlewares/errorHandler";
 
 // Import other feature routes here
@@ -46,6 +47,8 @@ app.use("/api/permission", permissionRoutes);
 app.use("/api/payment", paymentRoutes);
 
 app.use("/api/address", addressRoutes);
+
+app.use("/api/phoneOtp", phoneOtpRoutes);
 
 //Error handler
 
