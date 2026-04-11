@@ -11,7 +11,8 @@ import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
-import { UserResponseDto } from "./dto/user-response.dto";
+import passport from "./google.strategy";
+import jwt from "jsonwebtoken";
 
 const validateDto = async (dto: object) => {
   const errors = await validate(dto);
@@ -90,4 +91,38 @@ export const deleteMe = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const googleAuthController = passport.authenticate("google", {
+  scope: ["profile", "email"],
+  session: false,
+});
+
+export const googleCallbackController = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  passport.authenticate(
+    "google",
+    { session: false },
+    (err: Error, user: any) => {
+      if (err || !user) {
+        return res.status(401).json({
+          success: false,
+          message: err?.message ?? "Google authentication failed.",
+        });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET!,
+        { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
+      );
+      
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/auth/google/callback?token=${token}`,
+      );
+    },
+  )(req, res, next);
 };

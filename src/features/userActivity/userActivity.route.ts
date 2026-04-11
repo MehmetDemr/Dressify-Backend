@@ -11,14 +11,14 @@ import { Role } from "../user/user.model";
 
 const router = Router();
 
-router.use(authenticate);
+router.use(authenticate as any);
 
-router.get("/", getUserActivities);
-router.get("/:id", getActivityById);
-router.post("/", createActivity);
-router.delete("/:id", deleteActivity);
+router.get("/", getUserActivities as any);
+router.get("/:id", getActivityById as any);
+router.post("/", createActivity as any);
+router.delete("/:id", deleteActivity as any);
 
 // Admin only
-router.get("/admin/all", authorize(Role.ADMIN), getAllActivities); // All activities
+router.get("/admin/all", authorize(Role.ADMIN) as any, getAllActivities as any); // All activities
 
 export default router;

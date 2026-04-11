@@ -32,6 +32,7 @@ export enum Role {
 export enum UserGender {
   MALE = "male",
   FEMALE = "female",
+  UNKNOWN = "unknown",
 }
 
 export enum UserType {
