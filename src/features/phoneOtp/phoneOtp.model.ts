@@ -7,12 +7,28 @@ import {
   Default,
   AllowNull,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
+
+interface PhoneOtpAttributes {
+  id: string;
+  phone: string;
+  code: string;
+  expiresAt: Date;
+}
+
+interface PhoneOtpCreationAttributes extends Optional<
+  PhoneOtpAttributes,
+  "id"
+> {}
 
 @Table({
   tableName: "phoneOtp",
   timestamps: true,
 })
-export class PhoneOtp extends Model<PhoneOtp> {
+export class PhoneOtp extends Model<
+  PhoneOtpAttributes,
+  PhoneOtpCreationAttributes
+> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
