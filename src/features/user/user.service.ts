@@ -128,7 +128,7 @@ export const googleRegisterService = async (dto: GoogleRegisterDto) => {
   const user = await User.create({
     userName: dto.userName,
     email: dto.email,
-    phone: dto.phone ?? "01112223334",
+    phone: dto.phone ?? "",
     gender: UserGender.UNKNOWN,
     password: hashedPassword,
     role: Role.USER,
