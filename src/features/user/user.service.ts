@@ -8,6 +8,7 @@ import { AppError } from "../../utils/appError";
 import { Permission } from "../permission/permission.model";
 import crypto from "crypto";
 import { GoogleRegisterDto } from "./dto/google-register.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
@@ -169,4 +170,35 @@ export const googleLoginService = async (email: string) => {
   await user.update({ lastLogin: new Date() });
 
   return new UserResponseDto(user);
+};
+
+//Forgot Password
+
+export const ForgotPasswordService = async (dto: ForgotPasswordDto) => {
+  //Token validation
+  let payload: any;
+  try {
+    payload = jwt.verify(dto.resetToken, process.env.JWT_SECRET!);
+  } catch {
+    throw new AppError("Reset token is invalid or has expired.", 400);
+  }
+
+  // Purpose control
+  if (payload.purpose !== "password_reset") {
+    throw new AppError("Invalid token.", 403);
+  }
+
+  // Find user
+  const user = await User.findOne({
+    where: payload.email ? { email: payload.email } : { phone: payload.phone },
+  });
+  if (!user) {
+    throw new AppError("User not found.", 404);
+  }
+
+  // Hash password
+  const hashed = await bcrypt.hash(dto.newPassword, 10);
+  await user.update({ password: hashed });
+
+  return { message: "Password has been reset successfully." };
 };
