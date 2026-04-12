@@ -4,6 +4,7 @@ import { VerifyGmailOtpDto } from "./dto/verify-gmailOtp.dto";
 import { AppError } from "../../utils/appError";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_SERVER!,
@@ -73,12 +74,19 @@ export const verifyGmailOtpService = async (dto: VerifyGmailOtpDto) => {
     throw new AppError("The OTP has expired or is invalid.", 400);
   }
 
-  if (record.code !== dto.code) {
+  if (record.code !== dto.verifyCode) {
     throw new AppError("The OTP code is incorrect.", 400);
   }
 
   await record.destroy();
-  return { message: "Email address verified." };
+
+  const resetToken = jwt.sign(
+    { email: dto.email, purpose: "password_reset" },
+    process.env.JWT_SECRET!,
+    { expiresIn: "3m" },
+  );
+
+  return { message: "Email address verified.", resetToken };
 };
 
 const sendMail = async (to: string, code: string) => {

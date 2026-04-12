@@ -3,6 +3,7 @@ import { SendPhoneOtpDto } from "./dto/send-phoneOtp.dto";
 import { VerifyPhoneOtpDto } from "./dto/verify-phoneOtp.dto";
 import { AppError } from "../../utils/appError";
 import twilio from "twilio";
+import jwt from "jsonwebtoken";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -73,6 +74,12 @@ export const verifyOtpService = async (dto: VerifyPhoneOtpDto) => {
     throw new AppError("The OTP code is incorrect.", 400);
   }
 
+  const resetToken = jwt.sign(
+    { phone: dto.phoneNumber, purpose: "password_reset" },
+    process.env.JWT_SECRET!,
+    { expiresIn: "3m" },
+  );
+
   await record.destroy();
-  return { message: "Phone number verified." };
+  return { message: "Phone number verified.", resetToken };
 };
