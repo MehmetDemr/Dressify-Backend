@@ -209,3 +209,64 @@ export const verifyNewPhoneService = async (
 
   return { message: "Phone number updated successfully." };
 };
+
+//null number case
+
+export const sendOtpForAddPhoneService = async (
+  userId: string,
+  newPhone: string,
+) => {
+  const existing = await User.findOne({ where: { phone: newPhone } });
+  if (existing) {
+    throw new AppError("This phone number is already in use.", 409);
+  }
+
+  const now = new Date();
+
+  await client.verify.v2
+    .services(VERIFY_SERVICE_SID)
+    .verifications.create({ to: newPhone, channel: "sms" });
+
+  await PhoneOtp.upsert({
+    phone: newPhone,
+    code: "twilio",
+    expiresAt: new Date(now.getTime() + OTP_WINDOW_MS),
+    attempts: 1,
+  });
+
+  return { message: "Verification code sent." };
+};
+
+export const verifyOtpForAddPhoneService = async (
+  userId: string,
+  newPhone: string,
+  verifyCode: string,
+) => {
+  const user = await User.findByPk(userId);
+  if (!user) throw new AppError("User not found.", 404);
+
+  if (user.phone) {
+    throw new AppError("User already has a phone number.", 400);
+  }
+
+  const now = new Date();
+  const record = await PhoneOtp.findOne({ where: { phone: newPhone } });
+
+  if (!record || record.expiresAt < now) {
+    if (record) await record.destroy();
+    throw new AppError("The OTP has expired or is invalid.", 400);
+  }
+
+  const check = await client.verify.v2
+    .services(VERIFY_SERVICE_SID)
+    .verificationChecks.create({ to: newPhone, code: verifyCode });
+
+  if (check.status !== "approved") {
+    throw new AppError("The OTP code is incorrect.", 400);
+  }
+
+  await record.destroy();
+  await user.update({ phone: newPhone });
+
+  return { message: "Phone number added successfully." };
+};

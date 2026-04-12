@@ -6,8 +6,10 @@ import { SendPhoneOtpDto } from "./dto/send-phoneOtp.dto";
 import { VerifyPhoneOtpDto } from "./dto/verify-phoneOtp.dto";
 import {
   sendNewPhoneOtpService,
+  sendOtpForAddPhoneService,
   sendOtpService,
   verifyNewPhoneService,
+  verifyOtpForAddPhoneService,
   verifyOtpForPhoneChangeService,
   verifyOtpService,
 } from "./phoneOtp.service";
@@ -99,6 +101,49 @@ export const verifyNewPhoneOtp = async (
       dto.phoneChangeToken,
       dto.newPhone,
       dto.verifyCode,
+    );
+    res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//null phoneNumber case
+
+export const sendOtpForAddPhone = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) throw new AppError("Unauthorized.", 401);
+
+    const { newPhone } = req.body;
+    if (!newPhone) throw new AppError("newPhone is required.", 400);
+
+    const result = await sendOtpForAddPhoneService(userId, newPhone);
+    res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyOtpForAddPhone = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) throw new AppError("Unauthorized.", 401);
+
+    const { newPhone, verifyCode } = req.body;
+
+    const result = await verifyOtpForAddPhoneService(
+      userId,
+      newPhone,
+      verifyCode,
     );
     res.status(200).json({ success: true, ...result });
   } catch (error) {
