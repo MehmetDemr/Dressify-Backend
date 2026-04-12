@@ -9,6 +9,7 @@ import { Permission } from "../permission/permission.model";
 import crypto from "crypto";
 import { GoogleRegisterDto } from "./dto/google-register.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ChangePersonalInfoDto } from "./dto/change-personal-info.dto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
@@ -201,4 +202,24 @@ export const ForgotPasswordService = async (dto: ForgotPasswordDto) => {
   await user.update({ password: hashed });
 
   return { message: "Password has been reset successfully." };
+};
+
+//Change Personal Info
+
+export const ChangePersonalInfoService = async (
+  userId: string,
+  dto: ChangePersonalInfoDto,
+) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw new AppError("User not found.", 404);
+  }
+
+  user.userName = dto.newUserName;
+  user.gender = dto.newGender;
+
+  await user.save();
+
+  return user;
 };

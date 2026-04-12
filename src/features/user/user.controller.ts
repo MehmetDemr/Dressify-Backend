@@ -5,6 +5,7 @@ import {
   getMeService,
   deleteUserService,
   ForgotPasswordService,
+  ChangePersonalInfoService,
 } from "./user.service";
 import { AppError } from "../../utils/appError";
 import { RegisterDto } from "./dto/register.dto";
@@ -15,6 +16,7 @@ import passport from "./google.strategy";
 import jwt from "jsonwebtoken";
 import applePassport from "./apple.strategy";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ChangePersonalInfoDto } from "./dto/change-personal-info.dto";
 
 const validateDto = async (dto: object) => {
   const errors = await validate(dto);
@@ -177,6 +179,33 @@ export const forgotPassword = async (
     await validateDto(dto);
     const result = await ForgotPasswordService(dto);
     res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePersonalInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+      throw new AppError("Unauthorized.", 401);
+    }
+
+    const dto = plainToInstance(ChangePersonalInfoDto, req.body);
+    await validateDto(dto);
+
+    const result = await ChangePersonalInfoService(userId, dto);
+
+    res.status(200).json({
+      success: true,
+      message: "Personal info updated successfully.",
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
