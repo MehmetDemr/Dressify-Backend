@@ -5,6 +5,7 @@ import { AppError } from "../../utils/appError";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { User } from "../user/user.model";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_SERVER!,
@@ -87,6 +88,115 @@ export const verifyGmailOtpService = async (dto: VerifyGmailOtpDto) => {
   );
 
   return { message: "Email address verified.", resetToken };
+};
+
+export const verifyGmailOtpNewEmailService = async (dto: VerifyGmailOtpDto) => {
+  const now = new Date();
+
+  const record = await GmailOtp.findOne({
+    where: { email: dto.email },
+  });
+
+  if (!record || record.expiresAt < now) {
+    if (record) await record.destroy();
+    throw new AppError("The OTP has expired or is invalid.", 400);
+  }
+
+  if (record.code !== dto.verifyCode) {
+    throw new AppError("The OTP code is incorrect.", 400);
+  }
+
+  await record.destroy();
+
+  const resetToken = jwt.sign(
+    { email: dto.email, purpose: "email_change" },
+    process.env.JWT_SECRET!,
+    { expiresIn: "3m" },
+  );
+
+  return { message: "Email address verified.", resetToken };
+};
+
+//Change your email in profile page.
+
+export const sendNewEmailOtpService = async (
+  emailChangeToken: string,
+  newEmail: string,
+) => {
+  //  Verify Token
+  let payload: any;
+  try {
+    payload = jwt.verify(emailChangeToken, process.env.JWT_SECRET!);
+  } catch {
+    throw new AppError("Token is invalid or has expired.", 400);
+  }
+
+  if (payload.purpose !== "email_change") {
+    throw new AppError("Invalid token.", 403);
+  }
+
+  //  New email exists?
+  const existing = await User.findOne({ where: { email: newEmail } });
+  if (existing) {
+    throw new AppError("This email is already in use.", 409);
+  }
+
+  // Send OTP to new Email
+  const now = new Date();
+  const code = generateCode();
+
+  await GmailOtp.upsert({
+    email: newEmail,
+    code,
+    expiresAt: new Date(now.getTime() + OTP_WINDOW_MS),
+    attempts: 1,
+  });
+
+  await sendMail(newEmail, code);
+  return { message: "Verification code sent to new email." };
+};
+
+export const verifyNewEmailService = async (
+  emailChangeToken: string,
+  newEmail: string,
+  verifyCode: string,
+) => {
+  // Verify Token
+  let payload: any;
+  try {
+    payload = jwt.verify(emailChangeToken, process.env.JWT_SECRET!);
+  } catch {
+    throw new AppError("Token is invalid or has expired.", 400);
+  }
+
+  if (payload.purpose !== "email_change") {
+    throw new AppError("Invalid token.", 403);
+  }
+
+  // Check OTP of new email
+  const now = new Date();
+  const record = await GmailOtp.findOne({ where: { email: newEmail } });
+
+  if (!record || record.expiresAt < now) {
+    if (record) await record.destroy();
+    throw new AppError("The OTP has expired or is invalid.", 400);
+  }
+
+  if (record.code !== verifyCode) {
+    throw new AppError("The OTP code is incorrect.", 400);
+  }
+
+  await record.destroy();
+
+  // Change Email
+  const user = await User.findOne({ where: { email: payload.email } });
+  if (!user) {
+    throw new AppError("User not found.", 404);
+  }
+
+  await user.update({ email: newEmail });
+
+  return { message: "Email updated successfully." };
 };
 
 const sendMail = async (to: string, code: string) => {
