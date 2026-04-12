@@ -9,6 +9,7 @@ import {
   appleCallbackController,
   appleAuthController,
   forgotPassword,
+  changePersonalInfo,
 } from "./user.controller";
 import { authenticate, authorize } from "../../middlewares/auth.middleware";
 import { Role } from "./user.model";
@@ -40,6 +41,8 @@ router.get("/google/callback", googleCallbackController);
 router.get("/apple", appleAuthController);
 router.post("/apple/callback", appleCallbackController);
 
-router.post("/forgot-password",forgotPassword);
+router.post("/forgot-password", forgotPassword);
+
+router.patch("/change-personal-info", authenticate as any, changePersonalInfo);
 
 export default router;
