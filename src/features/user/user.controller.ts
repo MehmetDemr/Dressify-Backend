@@ -4,6 +4,8 @@ import {
   loginService,
   getMeService,
   deleteUserService,
+  ForgotPasswordService,
+  ChangePersonalInfoService,
 } from "./user.service";
 import { AppError } from "../../utils/appError";
 import { RegisterDto } from "./dto/register.dto";
@@ -13,6 +15,8 @@ import { validate } from "class-validator";
 import passport from "./google.strategy";
 import jwt from "jsonwebtoken";
 import applePassport from "./apple.strategy";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ChangePersonalInfoDto } from "./dto/change-personal-info.dto";
 
 const validateDto = async (dto: object) => {
   const errors = await validate(dto);
@@ -108,9 +112,9 @@ export const googleCallbackController = (
     { session: false },
     (err: Error, user: any) => {
       if (err || !user) {
-                console.log("Google callback error:", err);
-                console.log("Google callback user:", user);
-                console.log("Google auth user:", user?.email);
+        console.log("Google callback error:", err);
+        console.log("Google callback user:", user);
+        console.log("Google auth user:", user?.email);
         return res.status(401).json({
           success: false,
           message: err?.message ?? "Google authentication failed.",
@@ -130,7 +134,6 @@ export const googleCallbackController = (
   )(req, res, next);
 };
 
-
 export const appleAuthController = applePassport.authenticate("apple", {
   session: false,
 });
@@ -140,28 +143,70 @@ export const appleCallbackController = (
   res: Response,
   next: NextFunction,
 ) => {
-applePassport.authenticate(
-  "apple",
-  { session: false },
-  (err: Error, user: any) => {
-    console.log("Apple callback error:", err); 
-    console.log("Apple callback user:", user); 
+  applePassport.authenticate(
+    "apple",
+    { session: false },
+    (err: Error, user: any) => {
+      console.log("Apple callback error:", err);
+      console.log("Apple callback user:", user);
 
-    if (err || !user) {
-      return res.redirect(
-        `${process.env.FRONTEND_URL}/login?error=apple_failed`,
+      if (err || !user) {
+        return res.redirect(
+          `${process.env.FRONTEND_URL}/login?error=apple_failed`,
+        );
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET!,
+        { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
       );
+
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/auth/apple/callback?token=${token}`,
+      );
+    },
+  )(req, res, next);
+};
+
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const dto = plainToInstance(ForgotPasswordDto, req.body);
+    await validateDto(dto);
+    const result = await ForgotPasswordService(dto);
+    res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePersonalInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+      throw new AppError("Unauthorized.", 401);
     }
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: (process.env.JWT_EXPIRES_IN ?? "7d") as any },
-    );
+    const dto = plainToInstance(ChangePersonalInfoDto, req.body);
+    await validateDto(dto);
 
-    return res.redirect(
-      `${process.env.FRONTEND_URL}/auth/apple/callback?token=${token}`,
-    );
-  },
-)(req, res, next);
+    const result = await ChangePersonalInfoService(userId, dto);
+
+    res.status(200).json({
+      success: true,
+      message: "Personal info updated successfully.",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

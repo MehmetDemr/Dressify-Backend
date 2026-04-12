@@ -6,5 +6,5 @@ export class VerifyGmailOtpDto {
   declare email: string;
 
   @IsString()
-  declare code: string;
+  declare verifyCode: string;
 }
