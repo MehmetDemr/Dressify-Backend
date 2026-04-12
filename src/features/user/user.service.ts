@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { GoogleRegisterDto } from "./dto/google-register.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ChangePersonalInfoDto } from "./dto/change-personal-info.dto";
+import { ChangePasswordInProfileDto } from "./dto/change-password-in-profile.dto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
@@ -222,4 +223,28 @@ export const ChangePersonalInfoService = async (
   await user.save();
 
   return user;
+};
+
+//Change password
+
+export const ChangePasswordInProfileService = async (
+  userId: string,
+  dto: ChangePasswordInProfileDto,
+) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw new AppError("User not found.", 404);
+  }
+
+  const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+
+  if (!isMatch) {
+    throw new AppError("Password is not correct.", 401);
+  }
+
+  user.password = await bcrypt.hash(dto.newPassword, 10);
+  await user.save();
+
+  return { message: "Password updated successfully." };
 };
