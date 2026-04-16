@@ -10,19 +10,14 @@ export const createActivityService = async (
   userId: string,
   dto: CreateUserActivityDto,
 ) => {
-  const brand = await Brand.findByPk(dto.brand_id);
-  if (!brand) throw new AppError("Brand not found.", 404);
-
-  const category = await Category.findByPk(dto.category_id);
-  if (!category) throw new AppError("Category not found.", 404);
-
-  const product = await Product.findByPk(dto.product_id);
-  if (!product) throw new AppError("Product not found.", 404);
-
   const activity = await UserActivity.create({
     user_id: userId,
-    ...dto,
+    product_id: dto.product_id,
+    brand_id: dto.brand_id || null,
+    category_id: dto.category_id || null,
+    activityType: dto.activityType,
     active: true,
+    count: 1,
   });
 
   return new UserActivityResponseDto(activity);
@@ -89,6 +84,42 @@ export const deleteActivityService = async (
   });
   if (!activity) throw new AppError("Activity not found.", 404);
 
-  await activity.update({ active: false });
-  return { message: "Activity deleted successfully." };
+  await activity.destroy();
+  return { message: "Activity removed." };
+};
+
+export const updateActivityService = async (
+  userId: string,
+  dto: CreateUserActivityDto,
+) => {
+  if (!dto.product_id) throw new AppError("Product id is required.", 400);
+
+  const product = await Product.findByPk(dto.product_id);
+  if (!product) throw new AppError("Product not found.", 404);
+
+  const existing = await UserActivity.findOne({
+    where: {
+      user_id: userId,
+      product_id: dto.product_id,
+      activityType: dto.activityType,
+      active: true,
+    },
+  });
+
+  if (existing) {
+    await existing.update({ count: existing.count + 1 });
+    return new UserActivityResponseDto(existing);
+  }
+
+  const activity = await UserActivity.create({
+    user_id: userId,
+    product_id: dto.product_id || null,
+    brand_id: dto.brand_id || null,
+    category_id: dto.category_id || null,
+    activityType: dto.activityType,
+    active: true,
+    count: 1,
+  });
+
+  return new UserActivityResponseDto(activity);
 };

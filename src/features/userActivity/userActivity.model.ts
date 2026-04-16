@@ -42,24 +42,30 @@ export class UserActivity extends Model<
   declare user_id: string;
 
   @ForeignKey(() => Brand)
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.UUID)
-  declare brand_id: string;
+  declare brand_id: string | null;
 
   @ForeignKey(() => Category)
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.UUID)
-  declare category_id: string;
+  declare category_id: string | null;
 
   @ForeignKey(() => Product)
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.UUID)
-  declare product_id: string;
+  declare product_id: string | null;
 
   @AllowNull(false)
   @Column(DataType.ENUM(...Object.values(ActivityTypes)))
   declare activityType: ActivityTypes;
 
+  @Default(1)
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  declare count: CreationOptional<number>;
+
+  @Default(true)
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   declare active: CreationOptional<boolean>;
