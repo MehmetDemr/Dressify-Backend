@@ -1,18 +1,18 @@
-import { IsEnum, IsNotEmpty, IsUUID } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID } from "class-validator";
 import { ActivityTypes } from "../userActivity.model";
 
 export class CreateUserActivityDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID()
-  brand_id!: string;
+  brand_id?: string | null;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID()
-  category_id!: string;
+  category_id?: string | null;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID()
-  product_id!: string;
+  product_id?: string | null;
 
   @IsNotEmpty()
   @IsEnum(ActivityTypes, { message: "Invalid activity type." })

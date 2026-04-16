@@ -10,6 +10,7 @@ import {
   getActivityByIdService,
   getAllActivitiesService,
   deleteActivityService,
+  updateActivityService,
 } from "./userActivity.service";
 
 const validateDto = async (dto: object) => {
@@ -90,6 +91,22 @@ export const deleteActivity = async (
       req.params.id as string,
     );
     res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const updateActivity = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const dto = plainToInstance(CreateUserActivityDto, req.body);
+    await validateDto(dto);
+    const activity = await updateActivityService(req.user!.id, dto);
+    res.status(200).json({ success: true, data: activity });
   } catch (error) {
     next(error);
   }

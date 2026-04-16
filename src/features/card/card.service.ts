@@ -6,6 +6,11 @@ import { AppError } from "../../utils/appError";
 import { CardResponseDto } from "./dto/card-response.dto";
 import { CreateCardDto } from "./dto/create-card.dto";
 import { UpdateCardDto } from "./dto/update-card.dto";
+import { updateActivityService } from "../userActivity/userActivity.service";
+import {
+  ActivityTypes,
+  UserActivity,
+} from "../userActivity/userActivity.model";
 
 const cardInclude = [
   {
@@ -71,6 +76,22 @@ export const addToCardService = async (user_id: string, dto: CreateCardDto) => {
     active: true,
   } as any);
 
+  // Activity tracking
+  try {
+    const product = await Product.findByPk(dto.product_id, {
+      include: [{ model: Category, attributes: ["id", "brand_id"] }],
+    });
+
+    await updateActivityService(user_id, {
+      product_id: dto.product_id,
+      brand_id: product?.category?.brand_id ?? null,
+      category_id: product?.category_id ?? null,
+      activityType: ActivityTypes.SHOPPING,
+    });
+  } catch (err) {
+    console.error("Activity tracking failed:", err);
+  }
+
   return new CardResponseDto(item);
 };
 
@@ -91,5 +112,22 @@ export const removeFromCardService = async (id: string, user_id: string) => {
   if (!item) throw new AppError("Cart item not found.", 404);
 
   await item.destroy();
+
+  // Activity tracking
+  try {
+    const activity = await UserActivity.findOne({
+      where: {
+        user_id,
+        product_id: item.product_id,
+        activityType: ActivityTypes.SHOPPING,
+        active: true,
+      },
+    });
+
+    if (activity) await activity.destroy(); 
+  } catch (err) {
+    console.error("Activity tracking failed:", err);
+  }
+
   return { message: "Item removed from cart successfully." };
 };
