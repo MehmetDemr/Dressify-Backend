@@ -24,22 +24,29 @@ export const getAllProductsService = async (
   userId?: string,
   page: number = 1,
   limit: number = 24,
+  brandSlug?: string,
+  categorySlug?: string, 
 ) => {
   const offset = (page - 1) * limit;
 
   const { count, rows: products } = await Product.findAndCountAll({
     where: { active: true },
-    limit: limit,
-    offset: offset,
+    limit,
+    offset,
     distinct: true,
+    subQuery: false,
     include: [
       {
         model: Category,
         attributes: ["id", "categoryName", "categorySlug", "brand_id"],
+        required: !!brandSlug || !!categorySlug,
+        where: categorySlug ? { categorySlug } : undefined, 
         include: [
           {
             model: Brand,
             attributes: ["id", "brandName", "brandSlug"],
+            where: brandSlug ? { brandSlug, active: true } : undefined,
+            required: !!brandSlug,
           },
         ],
       },
@@ -54,11 +61,13 @@ export const getAllProductsService = async (
       where: { user_id: userId, active: true },
       attributes: ["product_id"],
     });
+
     favouriteIds = new Set(favourites.map((f) => String(f.product_id)));
   }
 
   const data = products.map((p) => {
     const dto = new ProductResponseDto(p);
+
     return {
       ...dto,
       isFavourite: favouriteIds.has(String(p.id)),
