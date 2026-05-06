@@ -46,9 +46,30 @@ export const getAllProducts = async (
 ) => {
   try {
     const userId = req.user?.id;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 24;
-    const result = await getAllProductsService(userId, page, limit);
+
+    const page = Number.parseInt(req.query.page as string, 10) || 1;
+    const limit = Number.parseInt(req.query.limit as string, 10) || 24;
+
+    const brandSlug =
+      typeof req.query.brandSlug === "string" && req.query.brandSlug.trim()
+        ? req.query.brandSlug.trim()
+        : undefined;
+
+    // ← BUNU EKLE
+    const categorySlug =
+      typeof req.query.categorySlug === "string" &&
+      req.query.categorySlug.trim()
+        ? req.query.categorySlug.trim()
+        : undefined;
+
+    const result = await getAllProductsService(
+      userId,
+      page,
+      limit,
+      brandSlug,
+      categorySlug,
+    );
+
     res.status(200).json({
       success: true,
       ...result,
@@ -57,7 +78,6 @@ export const getAllProducts = async (
     next(error);
   }
 };
-
 export const getProductById = async (
   req: AuthRequest,
   res: Response,
