@@ -215,3 +215,58 @@ const sendMail = async (to: string, code: string) => {
   });
   console.log("Mail result:", result);
 };
+
+export const sendContactEmail = async (
+  name: string,
+  email: string,
+  topic: string,
+  message: string,
+): Promise<{ message: string }> => {
+  if (!name || !email || !topic || !message) {
+    throw new AppError("All fields are required.", 400);
+  }
+
+  const topicLabels: Record<string, string> = {
+    support: "Customer Support",
+    partnership: "Brand Partnership",
+    returns: "Returns & Delivery",
+    general: "General Inquiry",
+  };
+
+  const topicLabel = topicLabels[topic] ?? topic;
+
+  await transporter.sendMail({
+    from: `"Dressify" <${process.env.SMTP_FROM}>`,
+    to: process.env.SMTP_FROM,
+    replyTo: `"${name}" <${email}>`,
+    subject: `[Dressify Contact] ${topicLabel}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 32px; border: 1px solid #e3e8ee; border-radius: 8px;">
+        <h2 style="color: #111111; margin-bottom: 4px;">New Contact Message</h2>
+        <p style="color: #888; font-size: 13px; margin-top: 0;">From Dressify Contact Page</p>
+        <hr style="border: none; border-top: 1px solid #e3e8ee; margin: 24px 0;" />
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr>
+            <td style="padding: 8px 0; color: #888; width: 120px;">Full Name</td>
+            <td style="color: #111; font-weight: 600;">${name}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #888;">Email</td>
+            <td style="color: #111; font-weight: 600;">${email}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; color: #888;">Topic</td>
+            <td style="color: #111; font-weight: 600;">${topicLabel}</td>
+          </tr>
+        </table>
+        <hr style="border: none; border-top: 1px solid #e3e8ee; margin: 24px 0;" />
+        <p style="color: #888; font-size: 13px; margin-bottom: 8px;">Message</p>
+        <p style="color: #111; line-height: 1.8; white-space: pre-wrap;">${message}</p>
+        <hr style="border: none; border-top: 1px solid #e3e8ee; margin: 24px 0;" />
+        <p style="color: #bbb; font-size: 11px;">Reply directly to this email to respond to ${name}.</p>
+      </div>
+    `,
+  });
+
+  return { message: "Your message has been sent successfully." };
+};
