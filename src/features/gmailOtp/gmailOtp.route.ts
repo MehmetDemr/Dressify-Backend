@@ -6,6 +6,7 @@ import {
   sendNewEmailOtp,
   verifyNewEmailOtp,
   verifyGmailOtpNewEmail,
+  contactController,
 } from "./gmailOtp.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 
@@ -21,5 +22,6 @@ router.post(
 );
 router.post("/send-new-email", authenticate as any, sendNewEmailOtp as any);
 router.post("/verify-new-email", authenticate as any, verifyNewEmailOtp as any);
+router.post("/contact", contactController);
 
 export default router;
