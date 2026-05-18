@@ -27,6 +27,22 @@ app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(helmet()); // Secure HTTP headers
 app.use(compression()); // Compress response bodies
 
+const rateLimit = require("express-rate-limit"); //Rate limiting
+
+const globalLimiter = rateLimit({
+  max: 30,
+  windowMs: 15 * 60 * 1000,
+  message: "Too many requests from this IP",
+});
+
+const otpLimiter = rateLimit({
+  max: 9,
+  windowMs: 1 * 60 * 1000,
+  message: "Too many OTP requests from this IP",
+});
+
+app.use(globalLimiter);
+
 // API Routes
 
 app.use("/api/user", userRoutes);
@@ -49,9 +65,9 @@ app.use("/api/payment", paymentRoutes);
 
 app.use("/api/address", addressRoutes);
 
-app.use("/api/phoneOtp", phoneOtpRoutes);
+app.use("/api/phoneOtp", otpLimiter, phoneOtpRoutes);
 
-app.use("/api/gmailOtp", gmailOtpRoutes);
+app.use("/api/gmailOtp", otpLimiter, gmailOtpRoutes);
 
 //Error handler
 
