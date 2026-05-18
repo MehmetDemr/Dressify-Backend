@@ -30,7 +30,7 @@ app.use(compression()); // Compress response bodies
 const rateLimit = require("express-rate-limit"); //Rate limiting
 
 const globalLimiter = rateLimit({
-  max: 30,
+  max: 100,
   windowMs: 15 * 60 * 1000,
   message: "Too many requests from this IP",
 });
