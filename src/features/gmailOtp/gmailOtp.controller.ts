@@ -5,6 +5,7 @@ import { AppError } from "../../utils/appError";
 import { SendGmailOtpDto } from "./dto/send-gmailOtp.dto";
 import { VerifyGmailOtpDto } from "./dto/verify-gmailOtp.dto";
 import {
+  sendContactEmail,
   sendGmailOtpService,
   sendNewEmailOtpService,
   verifyGmailOtpNewEmailService,
@@ -101,6 +102,20 @@ export const verifyNewEmailOtp = async (
       dto.newEmail,
       dto.verifyCode,
     );
+    res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const contactController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { name, email, topic, message } = req.body;
+    const result = await sendContactEmail(name, email, topic, message);
     res.status(200).json({ success: true, ...result });
   } catch (error) {
     next(error);
